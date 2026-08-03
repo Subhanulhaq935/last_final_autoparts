@@ -111,7 +111,7 @@ export default function POSRegister({
 
   return (
     <>
-    <div className="mx-auto flex max-w-7xl flex-1 flex-col gap-5 px-4 py-5 pb-28 sm:px-6 lg:flex-row lg:gap-6 lg:pb-5 lg:px-8">
+    <div className="mx-auto flex max-w-7xl flex-1 flex-col gap-5 px-4 py-5 pb-fab sm:px-6 lg:flex-row lg:gap-6 lg:pb-5 lg:px-8">
 
       {/* ═══ LEFT: Products Panel ═══ */}
       <div className="min-w-0 flex-1 space-y-4">
@@ -439,6 +439,7 @@ export default function POSRegister({
                     </p>
                     <input
                       type="number"
+                      inputMode="numeric"
                       min="0"
                       placeholder={discountType === "percent" ? "Enter %" : "Enter Rs."}
                       value={discountInput}
@@ -596,7 +597,7 @@ export default function POSRegister({
       </div>
 
       {/* Cart Footer (mobile) */}
-      <div className="space-y-3 border border-slate-200 bg-white px-5 py-4 dark:border-zinc-700/60 dark:bg-zinc-900">
+      <div className="space-y-3 border border-slate-200 bg-white px-5 py-4 pb-safe dark:border-zinc-700/60 dark:bg-zinc-900">
         <div className="space-y-1">
           {discountAmount > 0 && (
             <div className="flex items-baseline justify-between text-sm">
@@ -625,7 +626,7 @@ export default function POSRegister({
             <div className="flex items-end gap-2">
               <div className="flex-1">
                 <p className="mb-1 text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-zinc-500">Discount on Total</p>
-                <input type="number" min="0" placeholder={discountType === "percent" ? "Enter %" : "Enter Rs."} value={discountInput} onChange={(e) => setDiscountInput(e.target.value)}
+                <input type="number" inputMode="numeric" min="0" placeholder={discountType === "percent" ? "Enter %" : "Enter Rs."} value={discountInput} onChange={(e) => setDiscountInput(e.target.value)}
                   className="block w-full rounded-xl border-2 border-slate-200 bg-white px-3 py-2 text-sm font-bold text-slate-900 transition-colors focus:border-rose-400 focus:outline-none dark:border-zinc-600 dark:bg-zinc-800 dark:text-white" />
               </div>
               <div className="flex flex-col overflow-hidden rounded-xl border-2 border-slate-200 dark:border-zinc-600">
@@ -647,9 +648,12 @@ export default function POSRegister({
     </div>
 
     {/* Sticky View Cart FAB — mobile only, hidden when drawer is open */}
-    <div className={`fixed inset-x-0 bottom-0 z-30 p-4 lg:hidden transition-transform duration-300 ${
-      isMobileCartOpen ? "translate-y-full pointer-events-none" : "translate-y-0"
-    }`}>
+    <div
+      className={`fixed inset-x-0 bottom-0 z-30 px-4 pt-3 lg:hidden transition-transform duration-300 ${
+        isMobileCartOpen ? "translate-y-full pointer-events-none" : "translate-y-0"
+      }`}
+      style={{ paddingBottom: "max(1rem, env(safe-area-inset-bottom, 1rem))" }}
+    >
       <button
         onClick={() => setIsMobileCartOpen(true)}
         className={`relative w-full flex items-center justify-between rounded-2xl px-5 py-4 text-sm font-black shadow-2xl transition-all duration-200 active:scale-[0.98] ${

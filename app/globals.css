@@ -25,6 +25,8 @@ body {
   color: var(--foreground);
   font-family: 'Outfit', var(--font-geist-sans), ui-sans-serif, system-ui;
   -webkit-font-smoothing: antialiased;
+  /* Prevent elastic overscroll on iOS from shifting layout */
+  overscroll-behavior: none;
 }
 
 /* Urdu Typography */
@@ -53,6 +55,34 @@ body {
 }
 .dark .scrollbar-thin::-webkit-scrollbar-thumb { background: #334155; }
 
+/* ── Touch Optimizations ──────────────────────────────────────────────── */
+
+/* Remove 300ms tap delay on all interactive elements */
+button, a, input, select, textarea, [role="button"] {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Minimum touch target size (WCAG 2.5.5) */
+.touch-target {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Safe area inset helpers for notched phones (iPhone X+, Android punch-hole) */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.pt-safe {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+/* Bottom FAB clearance: accounts for both FAB height and safe area */
+.pb-fab {
+  padding-bottom: calc(5rem + env(safe-area-inset-bottom, 0px));
+}
+
 /* Card hover lift animation */
 @keyframes fadeInUp {
   from { opacity: 0; transform: translateY(8px); }
@@ -67,6 +97,7 @@ body {
     font-size: 12pt;
     margin: 0;
     padding: 0;
+    overscroll-behavior: auto;
   }
 
   header, main, footer, button, .print\:hidden { display: none !important; }

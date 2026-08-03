@@ -134,19 +134,19 @@ export default function StoreManager({
       : categories.find((c) => c.id === selectedCategory)?.name || "";
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
 
       {/* ── Page Header ── */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 shadow-lg shadow-indigo-500/25">
+            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 shadow-lg shadow-indigo-500/25">
               <svg className="h-5 w-5 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" />
               </svg>
             </div>
             <div>
-              <h2 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">
+              <h2 className="text-xl font-black tracking-tight text-slate-900 dark:text-white sm:text-2xl">
                 Store Inventory
               </h2>
               <p className="text-sm font-medium text-slate-500 dark:text-zinc-400">
@@ -157,7 +157,7 @@ export default function StoreManager({
         </div>
 
         {/* Stats + Actions */}
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
           {/* Stats chips */}
           <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 shadow-sm dark:border-zinc-700 dark:bg-zinc-900">
             <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-indigo-50 dark:bg-indigo-950/40">
@@ -184,9 +184,9 @@ export default function StoreManager({
 
           <button
             onClick={() => setIsAdding(true)}
-            className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-500/25 transition-all hover:from-indigo-500 hover:to-violet-500"
+            className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-500/25 transition-all hover:from-indigo-500 hover:to-violet-500 active:scale-95"
           >
-            <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+            <svg className="h-4 w-4 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
             </svg>
             Add New Item
@@ -195,7 +195,7 @@ export default function StoreManager({
       </div>
 
       {/* ── Search & Filter ── */}
-      <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
+      <div className="mt-5 flex flex-col gap-3 sm:mt-6 sm:flex-row sm:items-center">
         <div className="relative flex-1">
           <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
             <svg className="h-4 w-4 text-slate-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -213,7 +213,7 @@ export default function StoreManager({
         <select
           value={selectedCategory}
           onChange={(e) => setSelectedCategory(e.target.value)}
-          className="rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition-colors focus:border-indigo-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200"
+          className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition-colors focus:border-indigo-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 sm:w-auto"
         >
           <option value="all">All Categories</option>
           {categories.map((c) => (
@@ -237,8 +237,10 @@ export default function StoreManager({
         </p>
       </div>
 
-      {/* ── Inventory Table ── */}
-      <div className="mt-4 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-zinc-700 dark:bg-zinc-900">
+      {/* ══════════════════════════════════════════════════════════════════════════
+          DESKTOP TABLE (md and above)
+          ══════════════════════════════════════════════════════════════════════ */}
+      <div className="mt-4 hidden overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-zinc-700 dark:bg-zinc-900 md:block">
         <div className="overflow-x-auto">
           <table className="w-full border-collapse text-left text-sm">
             <thead>
@@ -286,7 +288,7 @@ export default function StoreManager({
                       <div className="flex flex-col gap-2">
                         {/* English name */}
                         <div className="flex items-center gap-1.5">
-                          <span className="flex-shrink-0 text-[9px] font-black uppercase tracking-widest text-slate-300 dark:text-zinc-600 w-4">EN</span>
+                          <span className="w-4 flex-shrink-0 text-[9px] font-black uppercase tracking-widest text-slate-300 dark:text-zinc-600">EN</span>
                           <input
                             type="text"
                             value={getDraftName(product)}
@@ -310,7 +312,7 @@ export default function StoreManager({
                         </div>
                         {/* Urdu name */}
                         <div className="flex items-center gap-1.5">
-                          <span className="flex-shrink-0 text-[9px] font-black uppercase tracking-widest text-slate-300 dark:text-zinc-600 w-4">UR</span>
+                          <span className="w-4 flex-shrink-0 text-[9px] font-black uppercase tracking-widest text-slate-300 dark:text-zinc-600">UR</span>
                           <input
                             type="text"
                             dir="rtl"
@@ -400,12 +402,158 @@ export default function StoreManager({
         </div>
       </div>
 
+      {/* ══════════════════════════════════════════════════════════════════════════
+          MOBILE CARD LIST (below md)
+          Each product renders as an editable card — touch-friendly with large
+          inputs, always-visible delete button, and inline save actions.
+          ══════════════════════════════════════════════════════════════════════ */}
+      <div className="mt-4 space-y-3 md:hidden">
+        {filteredProducts.length > 0 ? (
+          filteredProducts.map((product, index) => (
+            <div
+              key={product.id}
+              className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-zinc-700 dark:bg-zinc-900"
+            >
+              {/* Card top bar */}
+              <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50 px-4 py-2.5 dark:border-zinc-700/60 dark:bg-zinc-800/60">
+                <div className="flex items-center gap-2">
+                  <span className="flex h-5 w-5 items-center justify-center rounded-md bg-slate-200 text-[10px] font-black text-slate-500 dark:bg-zinc-700 dark:text-zinc-400">
+                    {index + 1}
+                  </span>
+                  {product.code && (
+                    <span className="rounded-md border border-amber-200 bg-amber-50 px-1.5 py-0.5 font-mono text-[10px] font-black text-amber-700 dark:border-amber-900/50 dark:bg-amber-950/20 dark:text-amber-400">
+                      #{product.code}
+                    </span>
+                  )}
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-zinc-500">
+                    {categories.find((c) => c.id === product.category)?.name ?? "—"}
+                  </span>
+                </div>
+                {/* Delete — always visible on mobile */}
+                <button
+                  onClick={() => onDeleteProduct(product.id)}
+                  className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-rose-50 hover:text-rose-600 active:scale-95 dark:text-zinc-600 dark:hover:bg-rose-950/20 dark:hover:text-rose-400"
+                  title="Delete product"
+                  aria-label="Delete product"
+                >
+                  <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                  </svg>
+                </button>
+              </div>
+
+              <div className="space-y-3 p-4">
+                {/* English name */}
+                <div>
+                  <label className="mb-1 block text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-zinc-500">
+                    English Name
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      value={getDraftName(product)}
+                      onChange={(e) =>
+                        setDraftNames((prev) => ({ ...prev, [product.id]: e.target.value }))
+                      }
+                      className="flex-1 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm font-semibold text-slate-900 transition-colors focus:border-indigo-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
+                    />
+                    {isNameDirty(product) && (
+                      <button
+                        onClick={() => handleSaveName(product)}
+                        className="flex-shrink-0 inline-flex items-center gap-1 rounded-xl bg-emerald-500 px-3 py-2.5 text-xs font-bold text-white shadow-sm transition-all hover:bg-emerald-600 active:scale-95"
+                      >
+                        <svg className="h-3 w-3" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                        </svg>
+                        Save
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Urdu name */}
+                <div>
+                  <label className="mb-1 block text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-zinc-500">
+                    اردو نام
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      dir="rtl"
+                      value={getDraftNameUrdu(product)}
+                      onChange={(e) =>
+                        setDraftNamesUrdu((prev) => ({ ...prev, [product.id]: e.target.value }))
+                      }
+                      placeholder="اردو نام درج کریں"
+                      className="flex-1 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm font-bold text-slate-600 transition-colors placeholder-slate-300 focus:border-violet-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:placeholder-zinc-700 font-urdu"
+                    />
+                    {isNameUrduDirty(product) && (
+                      <button
+                        onClick={() => handleSaveNameUrdu(product)}
+                        className="flex-shrink-0 inline-flex items-center gap-1 rounded-xl bg-violet-500 px-3 py-2.5 text-xs font-bold text-white shadow-sm transition-all hover:bg-violet-600 active:scale-95"
+                      >
+                        <svg className="h-3 w-3" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                        </svg>
+                        Save
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Price */}
+                <div>
+                  <label className="mb-1 block text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-zinc-500">
+                    Price (Rs.)
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <div className="flex flex-1 items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 transition-all focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500 dark:border-zinc-700 dark:bg-zinc-800">
+                      <span className="text-xs font-bold text-slate-400 dark:text-zinc-500">Rs.</span>
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        value={getDraftPrice(product)}
+                        onChange={(e) =>
+                          setDraftPrices((prev) => ({ ...prev, [product.id]: e.target.value }))
+                        }
+                        placeholder="0"
+                        className="flex-1 border-0 bg-transparent p-0 text-sm font-black text-slate-900 focus:outline-none dark:text-white"
+                      />
+                    </div>
+                    {isPriceDirty(product) && (
+                      <button
+                        onClick={() => handleSavePrice(product)}
+                        className="flex-shrink-0 inline-flex items-center gap-1 rounded-xl bg-emerald-500 px-3 py-2.5 text-xs font-bold text-white shadow-sm transition-all hover:bg-emerald-600 active:scale-95"
+                      >
+                        <svg className="h-3 w-3" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                        </svg>
+                        Save
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))
+        ) : (
+          <div className="flex flex-col items-center justify-center rounded-2xl border border-slate-200 bg-white py-16 text-center dark:border-zinc-700 dark:bg-zinc-900">
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100 dark:bg-zinc-800">
+              <svg className="h-7 w-7 text-slate-400 dark:text-zinc-600" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.637 10.637Z" />
+              </svg>
+            </div>
+            <p className="mt-4 text-sm font-bold text-slate-500 dark:text-zinc-500">No items match your search</p>
+          </div>
+        )}
+      </div>
+
       {/* ── Add Product Modal ── */}
       {isAdding && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-lg overflow-hidden rounded-2xl bg-white shadow-2xl dark:bg-zinc-900">
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 backdrop-blur-sm sm:items-center sm:p-4">
+          <div className="w-full max-w-lg overflow-hidden rounded-t-2xl bg-white shadow-2xl dark:bg-zinc-900 sm:rounded-2xl">
             {/* Modal header */}
-            <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4 dark:border-zinc-700">
+            <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4 dark:border-zinc-700 sm:px-6">
               <div className="flex items-center gap-2.5">
                 <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 shadow-md shadow-indigo-500/25">
                   <svg className="h-4 w-4 text-white" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
@@ -417,6 +565,7 @@ export default function StoreManager({
               <button
                 onClick={() => setIsAdding(false)}
                 className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
+                aria-label="Close"
               >
                 <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
@@ -424,7 +573,7 @@ export default function StoreManager({
               </button>
             </div>
 
-            <form onSubmit={handleAddSubmit} className="space-y-4 px-6 py-5">
+            <form onSubmit={handleAddSubmit} className="space-y-4 px-5 py-5 sm:px-6">
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="mb-1 block text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-zinc-500">
@@ -488,6 +637,7 @@ export default function StoreManager({
                 </label>
                 <input
                   type="text"
+                  inputMode="numeric"
                   value={newPrice}
                   onChange={(e) => setNewPrice(e.target.value)}
                   placeholder="e.g. 1500"
@@ -495,17 +645,17 @@ export default function StoreManager({
                 />
               </div>
 
-              <div className="flex gap-3 border-t border-slate-100 pt-4 dark:border-zinc-700">
+              <div className="flex gap-3 border-t border-slate-100 pt-4 dark:border-zinc-700 pb-safe">
                 <button
                   type="button"
                   onClick={() => setIsAdding(false)}
-                  className="flex-1 rounded-xl border border-slate-200 py-2.5 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                  className="flex-1 rounded-xl border border-slate-200 py-3 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-500/25 transition-all hover:from-indigo-500 hover:to-violet-500"
+                  className="flex-1 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-500/25 transition-all hover:from-indigo-500 hover:to-violet-500 active:scale-95"
                 >
                   Save Product
                 </button>
