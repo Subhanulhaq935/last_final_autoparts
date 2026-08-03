@@ -31,6 +31,7 @@ export default function StoreManager({
 
   // Draft state: holds unsaved edits keyed by product id
   const [draftNames, setDraftNames] = useState<Record<string, string>>({});
+  const [draftNamesUrdu, setDraftNamesUrdu] = useState<Record<string, string>>({});
   const [draftPrices, setDraftPrices] = useState<Record<string, string>>({});
 
   const filteredProducts = products.filter((product) => {
@@ -48,6 +49,9 @@ export default function StoreManager({
   const getDraftName = (product: Product) =>
     draftNames[product.id] !== undefined ? draftNames[product.id] : product.name;
 
+  const getDraftNameUrdu = (product: Product) =>
+    draftNamesUrdu[product.id] !== undefined ? draftNamesUrdu[product.id] : product.nameUrdu;
+
   const getDraftPrice = (product: Product) =>
     draftPrices[product.id] !== undefined
       ? draftPrices[product.id]
@@ -57,6 +61,9 @@ export default function StoreManager({
 
   const isNameDirty = (product: Product) =>
     draftNames[product.id] !== undefined && draftNames[product.id] !== product.name;
+
+  const isNameUrduDirty = (product: Product) =>
+    draftNamesUrdu[product.id] !== undefined && draftNamesUrdu[product.id] !== product.nameUrdu;
 
   const isPriceDirty = (product: Product) => {
     if (draftPrices[product.id] === undefined) return false;
@@ -72,6 +79,17 @@ export default function StoreManager({
     if (val === undefined || val === product.name) return;
     onUpdateProductDetails(product.id, { name: val });
     setDraftNames((prev) => {
+      const next = { ...prev };
+      delete next[product.id];
+      return next;
+    });
+  };
+
+  const handleSaveNameUrdu = (product: Product) => {
+    const val = draftNamesUrdu[product.id];
+    if (val === undefined || val === product.nameUrdu) return;
+    onUpdateProductDetails(product.id, { nameUrdu: val });
+    setDraftNamesUrdu((prev) => {
       const next = { ...prev };
       delete next[product.id];
       return next;
@@ -265,9 +283,10 @@ export default function StoreManager({
 
                     {/* Names */}
                     <td className="px-4 py-3.5">
-                      <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-4">
-                        {/* English name + Save */}
+                      <div className="flex flex-col gap-2">
+                        {/* English name */}
                         <div className="flex items-center gap-1.5">
+                          <span className="flex-shrink-0 text-[9px] font-black uppercase tracking-widest text-slate-300 dark:text-zinc-600 w-4">EN</span>
                           <input
                             type="text"
                             value={getDraftName(product)}
@@ -279,8 +298,34 @@ export default function StoreManager({
                           {isNameDirty(product) && (
                             <button
                               onClick={() => handleSaveName(product)}
-                              title="Save name"
+                              title="Save English name"
                               className="flex-shrink-0 inline-flex items-center gap-1 rounded-md bg-emerald-500 px-2 py-0.5 text-[10px] font-bold text-white shadow-sm transition-all hover:bg-emerald-600 active:scale-95"
+                            >
+                              <svg className="h-3 w-3" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                              </svg>
+                              Save
+                            </button>
+                          )}
+                        </div>
+                        {/* Urdu name */}
+                        <div className="flex items-center gap-1.5">
+                          <span className="flex-shrink-0 text-[9px] font-black uppercase tracking-widest text-slate-300 dark:text-zinc-600 w-4">UR</span>
+                          <input
+                            type="text"
+                            dir="rtl"
+                            value={getDraftNameUrdu(product)}
+                            onChange={(e) =>
+                              setDraftNamesUrdu((prev) => ({ ...prev, [product.id]: e.target.value }))
+                            }
+                            placeholder="اردو نام"
+                            className="w-full max-w-xs border-b border-transparent bg-transparent py-0.5 text-sm font-bold text-slate-600 transition-colors placeholder-slate-300 hover:border-slate-300 focus:border-violet-500 focus:outline-none dark:text-zinc-300 dark:placeholder-zinc-700 dark:hover:border-zinc-600 font-urdu"
+                          />
+                          {isNameUrduDirty(product) && (
+                            <button
+                              onClick={() => handleSaveNameUrdu(product)}
+                              title="Save Urdu name"
+                              className="flex-shrink-0 inline-flex items-center gap-1 rounded-md bg-violet-500 px-2 py-0.5 text-[10px] font-bold text-white shadow-sm transition-all hover:bg-violet-600 active:scale-95"
                             >
                               <svg className="h-3 w-3" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
