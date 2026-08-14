@@ -247,10 +247,10 @@ export default function POSRegister({
 
                 {/* Names */}
                 <div className="mt-2.5 flex-1 space-y-1">
-                  <p className="line-clamp-2 text-xs font-light leading-tight text-slate-900 transition-colors group-hover:text-indigo-700 dark:text-white dark:group-hover:text-indigo-300">
+                  <p className="line-clamp-2 text-xs font-bold leading-tight text-slate-900 transition-colors group-hover:text-indigo-700 dark:text-white dark:group-hover:text-indigo-300">
                     {product.name}
                   </p>
-                  <p className="line-clamp-1 text-right text-[10px] font-bold leading-relaxed text-slate-500 dark:text-zinc-400 font-urdu" dir="rtl">
+                  <p className="line-clamp-1 text-right text-[10px] font-bold leading-relaxed text-slate-600 dark:text-zinc-300 font-urdu" dir="rtl">
                     {product.nameUrdu}
                   </p>
                 </div>
@@ -325,10 +325,10 @@ export default function POSRegister({
                       #{item.product.code || "–"}
                     </span>
                   </div>
-                  <p className="truncate text-xs font-light text-slate-900 dark:text-white leading-tight">
+                  <p className="truncate text-xs font-bold text-slate-900 dark:text-white leading-tight">
                     {item.product.name}
                   </p>
-                  <p className="text-right text-[10px] font-bold text-slate-500 dark:text-zinc-400 font-urdu leading-loose" dir="rtl">
+                  <p className="text-right text-[10px] font-bold text-slate-600 dark:text-zinc-300 font-urdu leading-loose" dir="rtl">
                     {item.product.nameUrdu}
                   </p>
                   <p className="mt-1 text-[11px] font-semibold text-slate-500 dark:text-zinc-400">
@@ -563,8 +563,8 @@ export default function POSRegister({
                 <div className="flex items-center gap-1.5 mb-0.5">
                   <span className="font-mono text-[9px] font-black text-slate-400 dark:text-zinc-600">#{item.product.code || "–"}</span>
                 </div>
-                <p className="truncate text-xs font-light text-slate-900 dark:text-white leading-tight">{item.product.name}</p>
-                <p className="text-right text-[10px] font-bold text-slate-500 dark:text-zinc-400 font-urdu leading-loose" dir="rtl">{item.product.nameUrdu}</p>
+                <p className="truncate text-xs font-bold text-slate-900 dark:text-white leading-tight">{item.product.name}</p>
+                <p className="text-right text-[10px] font-bold text-slate-600 dark:text-zinc-300 font-urdu leading-loose" dir="rtl">{item.product.nameUrdu}</p>
                 <p className="mt-1 text-[11px] font-semibold text-slate-500 dark:text-zinc-400">
                   Rs.{item.product.price.toLocaleString()} × {item.quantity} =&nbsp;
                   <span className="font-black text-indigo-600 dark:text-indigo-400">Rs.{(item.product.price * item.quantity).toLocaleString()}</span>

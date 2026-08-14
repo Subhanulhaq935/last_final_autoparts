@@ -94,12 +94,12 @@ export default function ReceiptModal({
                   <MKSLogo size={60} />
                 </div>
                 <div className="min-w-0">
-                  <p className="text-sm font-light text-zinc-900 sm:text-base">{SHOP.name}</p>
-                  <p className="font-urdu text-xs font-bold text-zinc-700 sm:text-sm" dir="rtl">{SHOP.nameUrdu}</p>
-                  <p className="mt-1 text-xs font-light text-zinc-500">{SHOP.address}</p>
+                  <p className="text-sm font-black text-zinc-900 sm:text-base">{SHOP.name}</p>
+                  <p className="font-urdu text-xs font-black text-zinc-800 sm:text-sm" dir="rtl">{SHOP.nameUrdu}</p>
+                  <p className="mt-1 text-xs font-bold text-zinc-600">{SHOP.address}</p>
                   <div className="mt-1 flex flex-wrap gap-x-3 gap-y-0.5">
                     {SHOP.phones.map((p) => (
-                      <span key={p} className="text-[11px] font-light text-zinc-600">
+                      <span key={p} className="text-[11px] font-bold text-zinc-700">
                         📞 {p}
                       </span>
                     ))}
@@ -161,11 +161,11 @@ export default function ReceiptModal({
             <table className="w-full min-w-[420px] border-collapse text-sm">
               <thead>
                 <tr className="border-b-2 border-zinc-900">
-                  <th className="py-2 text-left text-[11px] font-black uppercase tracking-widest text-zinc-500">#</th>
-                  <th className="py-2 text-left text-[11px] font-black uppercase tracking-widest text-zinc-500">Product / Item</th>
-                  <th className="py-2 text-right text-[11px] font-black uppercase tracking-widest text-zinc-500">Qty</th>
-                  <th className="py-2 text-right text-[11px] font-black uppercase tracking-widest text-zinc-500">Rate</th>
-                  <th className="py-2 text-right text-[11px] font-black uppercase tracking-widest text-zinc-500">Amount</th>
+                  <th className="py-2 text-left text-[11px] font-black uppercase tracking-widest text-zinc-900">#</th>
+                  <th className="py-2 text-left text-[11px] font-black uppercase tracking-widest text-zinc-900">Product / Item</th>
+                  <th className="py-2 text-right text-[11px] font-black uppercase tracking-widest text-zinc-900">Qty</th>
+                  <th className="py-2 text-right text-[11px] font-black uppercase tracking-widest text-zinc-900">Rate</th>
+                  <th className="py-2 text-right text-[11px] font-black uppercase tracking-widest text-zinc-900">Amount</th>
                 </tr>
               </thead>
               <tbody>
@@ -176,7 +176,7 @@ export default function ReceiptModal({
                   >
                     <td className="py-2 pr-2 text-xs font-bold text-zinc-400">{index + 1}</td>
                     <td className="py-2 pr-4">
-                      <p className="font-light leading-snug text-zinc-900">{item.product.name}</p>
+                      <p className="font-bold leading-snug text-zinc-900">{item.product.name}</p>
                       {item.product.nameUrdu && (
                         <p className="text-right text-xs font-bold text-zinc-900 font-urdu" dir="rtl"
                           style={{ fontWeight: 700, textShadow: "0 0 0.4px currentColor" }}>
@@ -189,8 +189,8 @@ export default function ReceiptModal({
                         </span>
                       )}
                     </td>
-                    <td className="py-2 text-right font-light text-zinc-700">{item.quantity}</td>
-                    <td className="py-2 text-right font-light text-zinc-700">{item.product.price.toLocaleString()}</td>
+                    <td className="py-2 text-right font-bold text-zinc-800">{item.quantity}</td>
+                    <td className="py-2 text-right font-bold text-zinc-800">{item.product.price.toLocaleString()}</td>
                     <td className="py-2 text-right font-black text-zinc-900">
                       {(item.product.price * item.quantity).toLocaleString()}
                     </td>

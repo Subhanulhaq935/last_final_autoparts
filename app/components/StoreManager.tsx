@@ -245,19 +245,19 @@ export default function StoreManager({
           <table className="w-full border-collapse text-left text-sm">
             <thead>
               <tr className="border-b border-slate-200 bg-slate-50 dark:border-zinc-700 dark:bg-zinc-800/60">
-                <th className="w-12 px-4 py-3.5 text-center text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-zinc-500">
+                <th className="w-12 px-4 py-3.5 text-center text-[11px] font-black uppercase tracking-widest text-slate-700 dark:text-zinc-300">
                   #
                 </th>
-                <th className="w-16 px-4 py-3.5 text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-zinc-500">
+                <th className="w-16 px-4 py-3.5 text-[11px] font-black uppercase tracking-widest text-slate-700 dark:text-zinc-300">
                   Code
                 </th>
-                <th className="px-4 py-3.5 text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-zinc-500">
+                <th className="px-4 py-3.5 text-[11px] font-black uppercase tracking-widest text-slate-700 dark:text-zinc-300">
                   Item Details (English / Urdu)
                 </th>
-                <th className="w-44 px-4 py-3.5 text-right text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-zinc-500">
+                <th className="w-44 px-4 py-3.5 text-right text-[11px] font-black uppercase tracking-widest text-slate-700 dark:text-zinc-300">
                   Price (Rs.)
                 </th>
-                <th className="w-16 px-4 py-3.5 text-center text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-zinc-500">
+                <th className="w-16 px-4 py-3.5 text-center text-[11px] font-black uppercase tracking-widest text-slate-700 dark:text-zinc-300">
                   Del
                 </th>
               </tr>
@@ -295,7 +295,7 @@ export default function StoreManager({
                             onChange={(e) =>
                               setDraftNames((prev) => ({ ...prev, [product.id]: e.target.value }))
                             }
-                            className="w-full max-w-xs border-b border-transparent bg-transparent py-0.5 text-sm font-semibold text-slate-900 transition-colors hover:border-slate-300 focus:border-indigo-500 focus:outline-none dark:text-white dark:hover:border-zinc-600"
+                            className="w-full max-w-xs border-b border-transparent bg-transparent py-0.5 text-sm font-bold text-slate-900 transition-colors hover:border-slate-300 focus:border-indigo-500 focus:outline-none dark:text-white dark:hover:border-zinc-600"
                           />
                           {isNameDirty(product) && (
                             <button
@@ -455,7 +455,7 @@ export default function StoreManager({
                       onChange={(e) =>
                         setDraftNames((prev) => ({ ...prev, [product.id]: e.target.value }))
                       }
-                      className="flex-1 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm font-semibold text-slate-900 transition-colors focus:border-indigo-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
+                      className="flex-1 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm font-bold text-slate-900 transition-colors focus:border-indigo-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
                     />
                     {isNameDirty(product) && (
                       <button

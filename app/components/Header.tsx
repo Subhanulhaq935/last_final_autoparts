@@ -34,9 +34,9 @@ export default function Header({
           </div>
           <div className="min-w-0 overflow-hidden">
             <h1 className="truncate text-sm font-black tracking-tight text-zinc-900 dark:text-white sm:text-base">
-              Shabbir Khan <span className="gradient-text">Auto Body</span> Parts
+              Shabbir Khan <span className="gradient-text font-black">Auto Body</span> Parts
             </h1>
-            <p className="hidden text-[10px] font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-500 sm:block">
+            <p className="hidden text-[10px] font-bold uppercase tracking-widest text-zinc-500 dark:text-zinc-400 sm:block">
               Band Road, Lahore · Billing System
             </p>
           </div>
@@ -46,7 +46,7 @@ export default function Header({
         <nav className="flex flex-shrink-0 items-center gap-1 rounded-2xl bg-slate-100/80 p-1 dark:bg-zinc-900">
           <button
             onClick={() => onViewChange("register")}
-            className={`flex items-center gap-1.5 rounded-xl px-2.5 py-2 text-xs font-semibold transition-all duration-200 sm:gap-2 sm:px-4 sm:text-sm ${
+            className={`flex items-center gap-1.5 rounded-xl px-2.5 py-2 text-xs font-bold transition-all duration-200 sm:gap-2 sm:px-4 sm:text-sm ${
               currentView === "register"
                 ? "bg-white text-indigo-600 shadow-md shadow-black/5 dark:bg-zinc-800 dark:text-indigo-400"
                 : "text-slate-500 hover:text-slate-800 dark:text-zinc-400 dark:hover:text-zinc-200"
@@ -59,7 +59,7 @@ export default function Header({
           </button>
           <button
             onClick={() => onViewChange("manager")}
-            className={`flex items-center gap-1.5 rounded-xl px-2.5 py-2 text-xs font-semibold transition-all duration-200 sm:gap-2 sm:px-4 sm:text-sm ${
+            className={`flex items-center gap-1.5 rounded-xl px-2.5 py-2 text-xs font-bold transition-all duration-200 sm:gap-2 sm:px-4 sm:text-sm ${
               currentView === "manager"
                 ? "bg-white text-indigo-600 shadow-md shadow-black/5 dark:bg-zinc-800 dark:text-indigo-400"
                 : "text-slate-500 hover:text-slate-800 dark:text-zinc-400 dark:hover:text-zinc-200"
