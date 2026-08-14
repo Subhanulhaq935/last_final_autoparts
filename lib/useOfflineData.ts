@@ -144,9 +144,41 @@ export function useOfflineData(): OfflineDataResult {
     }
   }, []);
 
-  // Initial load on mount
+
+  // ── Initial load on mount ──────────────────────────────────────────────────
   useEffect(() => {
     loadData();
+  }, [loadData]);
+
+  // ── Auto-refresh: tab visibility + window focus ────────────────────────────
+  // When user switches back to this tab / app window, silently reload from
+  // the server so they always see the latest data from other devices.
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && navigator.onLine) {
+        loadData();
+      }
+    };
+    const handleFocus = () => {
+      if (navigator.onLine) loadData();
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, [loadData]);
+
+  // ── Background polling every 60 s (while online) ───────────────────────────
+  // Keeps all open devices in sync even if the tab stays open and focused.
+  useEffect(() => {
+    const id = setInterval(() => {
+      if (navigator.onLine) loadData();
+    }, 60_000);
+    return () => clearInterval(id);
   }, [loadData]);
 
   // ── Mutation: Add Product ─────────────────────────────────────────────────
