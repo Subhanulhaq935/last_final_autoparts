@@ -5,6 +5,7 @@ import Header        from "./components/Header";
 import POSRegister   from "./components/POSRegister";
 import StoreManager  from "./components/StoreManager";
 import ReceiptModal  from "./components/ReceiptModal";
+import CustomerManager from "./components/CustomerManager";
 import MKSLogo       from "./components/MKSLogo";
 import type { Product, Category } from "./types";
 
@@ -112,7 +113,7 @@ export default function Home() {
 
   // ── UI state ────────────────────────────────────────────────────────────────
   const [showWelcome, setShowWelcome] = useState(true);
-  const [view, setView]               = useState<"register" | "manager">("register");
+  const [view, setView]               = useState<"register" | "manager" | "customers">("register");
   const [cart, setCart]               = useState<CartItem[]>([]);
 
   // Checkout modal
@@ -122,7 +123,9 @@ export default function Home() {
   const [receiptDiscount,   setReceiptDiscount]   = useState(0);
   const [receiptCustomer,   setReceiptCustomer]   = useState("");
   const [receiptInvoiceNum,     setReceiptInvoiceNum]     = useState("");
-  const [receiptPaymentMethod,  setReceiptPaymentMethod]  = useState<"cash" | "card">("cash");
+  const [receiptPaymentMethod,  setReceiptPaymentMethod]  = useState<"cash" | "card" | "credit">("cash");
+  const [receiptCustomerId,     setReceiptCustomerId]     = useState<string | undefined>(undefined);
+  const [receiptCustomerPhone,  setReceiptCustomerPhone]  = useState<string | undefined>(undefined);
 
   // Manager password gate
   const [managerUnlocked,    setManagerUnlocked]    = useState(false);
@@ -131,7 +134,7 @@ export default function Home() {
   const [passwordError,      setPasswordError]      = useState(false);
 
   // ── View change / password ──────────────────────────────────────────────────
-  const handleViewChange = (newView: "register" | "manager") => {
+  const handleViewChange = (newView: "register" | "manager" | "customers") => {
     if (newView === "manager" && !managerUnlocked) {
       setPasswordInput("");
       setPasswordError(false);
@@ -182,10 +185,40 @@ export default function Home() {
   const handleClearCart = () => setCart([]);
 
   // ── Checkout ────────────────────────────────────────────────────────────────
-  const handleCheckout = (discountAmount: number, customerName: string, paymentMethod: "cash" | "card") => {
+  const handleCheckout = async (
+    discountAmount: number,
+    customerName: string,
+    paymentMethod: "cash" | "card" | "credit",
+    customerId?: string,
+    customerPhone?: string
+  ) => {
     const subtotal   = cart.reduce((acc, i) => acc + i.product.price * i.quantity, 0);
     const finalTotal = subtotal - discountAmount;
     const invoiceNum = `INV-${Math.floor(100000 + Math.random() * 900000)}`;
+
+    // Persist sale to MongoDB (fire-and-forget, non-blocking)
+    fetch("/api/sales", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        invoiceNumber:  invoiceNum,
+        customerId:     customerId,
+        customerName:   customerName || undefined,
+        items: cart.map((i) => ({
+          productId:       i.product.id,
+          productName:     i.product.name,
+          productNameUrdu: i.product.nameUrdu,
+          productCode:     i.product.code,
+          quantity:        i.quantity,
+          unitPrice:       i.product.price,
+          totalPrice:      i.product.price * i.quantity,
+        })),
+        subtotal,
+        discountAmount,
+        totalAmount:    finalTotal,
+        paymentMethod,
+      }),
+    }).catch(() => {/* offline — sale is still shown locally */});
 
     setReceiptCart(cart);
     setReceiptTotal(finalTotal);
@@ -193,6 +226,8 @@ export default function Home() {
     setReceiptCustomer(customerName);
     setReceiptInvoiceNum(invoiceNum);
     setReceiptPaymentMethod(paymentMethod);
+    setReceiptCustomerId(customerId);
+    setReceiptCustomerPhone(customerPhone);
     setIsReceiptOpen(true);
     setCart([]);
   };
@@ -313,6 +348,8 @@ export default function Home() {
             onClearCart={handleClearCart}
             onCheckout={handleCheckout}
           />
+        ) : view === "customers" ? (
+          <CustomerManager />
         ) : (
           <StoreManager
             products={products}
@@ -334,6 +371,7 @@ export default function Home() {
         customerName={receiptCustomer}
         invoiceNumber={receiptInvoiceNum}
         paymentMethod={receiptPaymentMethod}
+        customerPhone={receiptCustomerPhone}
       />
 
       {/* Store Manager Password Modal */}

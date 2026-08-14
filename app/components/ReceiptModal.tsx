@@ -16,8 +16,9 @@ interface ReceiptModalProps {
   totalAmount: number;
   discountAmount?: number;
   customerName?: string;
+  customerPhone?: string;
   invoiceNumber: string;
-  paymentMethod?: "cash" | "card";
+  paymentMethod?: "cash" | "card" | "credit";
 }
 
 const SHOP = {
@@ -34,6 +35,7 @@ export default function ReceiptModal({
   totalAmount,
   discountAmount = 0,
   customerName = "",
+  customerPhone,
   invoiceNumber,
   paymentMethod = "cash",
 }: ReceiptModalProps) {
@@ -131,6 +133,12 @@ export default function ReceiptModal({
                       <span className="font-black text-zinc-900">{customerName}</span>
                     </p>
                   )}
+                  {customerPhone && (
+                    <p>
+                      <span className="font-semibold text-zinc-700">Phone:</span>{" "}
+                      <span className="font-black text-zinc-900">{customerPhone}</span>
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
@@ -159,9 +167,9 @@ export default function ReceiptModal({
               <div>
                 <p className="font-black uppercase tracking-wider text-zinc-400">Payment</p>
                 <p className={`mt-0.5 font-black ${
-                  paymentMethod === "cash" ? "text-emerald-700" : "text-indigo-700"
+                  paymentMethod === "cash" ? "text-emerald-700" : paymentMethod === "credit" ? "text-amber-700" : "text-indigo-700"
                 }`}>
-                  {paymentMethod === "cash" ? "💵 Cash" : "💳 Credit Card"}
+                  {paymentMethod === "cash" ? "💵 Cash" : paymentMethod === "credit" ? "📋 Credit / Udhaar" : "💳 Credit Card"}
                 </p>
               </div>
             </div>
@@ -244,11 +252,16 @@ export default function ReceiptModal({
                 <div className="mt-2 flex items-center justify-between rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2">
                   <span className="text-xs font-black uppercase tracking-wider text-zinc-400">Payment Method</span>
                   <span className={`text-sm font-black ${
-                    paymentMethod === "cash" ? "text-emerald-700" : "text-indigo-700"
+                    paymentMethod === "cash" ? "text-emerald-700" : paymentMethod === "credit" ? "text-amber-700" : "text-indigo-700"
                   }`}>
-                    {paymentMethod === "cash" ? "💵 Cash" : "💳 Credit Card"}
+                    {paymentMethod === "cash" ? "💵 Cash" : paymentMethod === "credit" ? "📋 Credit / Udhaar" : "💳 Credit Card"}
                   </span>
                 </div>
+                {paymentMethod === "credit" && (
+                  <div className="mt-1.5 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-center dark:border-amber-800/50 dark:bg-amber-950/20">
+                    <p className="text-xs font-black text-amber-700">⚠ Credit Sale — Amount Added to Customer Balance</p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
