@@ -127,32 +127,50 @@ export default function Home() {
   const [receiptCustomerId,     setReceiptCustomerId]     = useState<string | undefined>(undefined);
   const [receiptCustomerPhone,  setReceiptCustomerPhone]  = useState<string | undefined>(undefined);
 
-  // Manager password gate
-  const [managerUnlocked,    setManagerUnlocked]    = useState(false);
-  const [showPasswordModal,  setShowPasswordModal]  = useState(false);
-  const [passwordInput,      setPasswordInput]      = useState("");
-  const [passwordError,      setPasswordError]      = useState(false);
+  // Protected sections password gate
+  const [managerUnlocked,      setManagerUnlocked]      = useState(false);
+  const [customersUnlocked,    setCustomersUnlocked]    = useState(false);
+  const [showPasswordModal,    setShowPasswordModal]    = useState(false);
+  const [passwordTargetView,   setPasswordTargetView]   = useState<"manager" | "customers">("manager");
+  const [passwordInput,        setPasswordInput]        = useState("");
+  const [passwordError,        setPasswordError]        = useState(false);
 
-  // ── View change / password ──────────────────────────────────────────────────
+  // ── View change / password gate ─────────────────────────────────────────────
   const handleViewChange = (newView: "register" | "manager" | "customers") => {
     if (newView === "manager" && !managerUnlocked) {
+      setPasswordTargetView("manager");
       setPasswordInput("");
       setPasswordError(false);
       setShowPasswordModal(true);
       return;
     }
-    if (newView === "register") setManagerUnlocked(false);
+    if (newView === "customers" && !customersUnlocked) {
+      setPasswordTargetView("customers");
+      setPasswordInput("");
+      setPasswordError(false);
+      setShowPasswordModal(true);
+      return;
+    }
+    if (newView === "register") {
+      setManagerUnlocked(false);
+      setCustomersUnlocked(false);
+    }
     setView(newView);
   };
 
   const handlePasswordSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (passwordInput === MANAGER_PASSWORD) {
-      setManagerUnlocked(true);
+      if (passwordTargetView === "manager") {
+        setManagerUnlocked(true);
+        setView("manager");
+      } else {
+        setCustomersUnlocked(true);
+        setView("customers");
+      }
       setShowPasswordModal(false);
       setPasswordInput("");
       setPasswordError(false);
-      setView("manager");
     } else {
       setPasswordError(true);
       setPasswordInput("");
@@ -374,20 +392,36 @@ export default function Home() {
         customerPhone={receiptCustomerPhone}
       />
 
-      {/* Store Manager Password Modal */}
+      {/* Protected View Password Modal */}
       {showPasswordModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
           <div className="w-full max-w-sm overflow-hidden rounded-2xl bg-white shadow-2xl dark:bg-zinc-900">
             {/* Header */}
-            <div className="flex flex-col items-center gap-3 bg-gradient-to-br from-indigo-600 to-violet-700 px-6 py-7">
+            <div className={`flex flex-col items-center gap-3 px-6 py-7 text-center ${
+              passwordTargetView === "customers"
+                ? "bg-gradient-to-br from-violet-600 to-indigo-700"
+                : "bg-gradient-to-br from-indigo-600 to-violet-700"
+            }`}>
               <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/15 backdrop-blur-sm shadow-lg">
-                <svg className="h-7 w-7 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
-                </svg>
+                {passwordTargetView === "customers" ? (
+                  <svg className="h-7 w-7 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
+                  </svg>
+                ) : (
+                  <svg className="h-7 w-7 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+                  </svg>
+                )}
               </div>
-              <div className="text-center">
-                <h2 className="text-lg font-black text-white">Store Manager</h2>
-                <p className="mt-0.5 text-sm text-indigo-200">Enter the password to continue</p>
+              <div>
+                <h2 className="text-lg font-black text-white">
+                  {passwordTargetView === "customers" ? "Customer Records & Ledger" : "Store Manager"}
+                </h2>
+                <p className="mt-0.5 text-xs font-semibold text-violet-200">
+                  {passwordTargetView === "customers"
+                    ? "Enter password to access customer records & ledger"
+                    : "Enter password to access inventory manager"}
+                </p>
               </div>
             </div>
 
@@ -401,12 +435,12 @@ export default function Home() {
                   type="password"
                   value={passwordInput}
                   onChange={(e) => { setPasswordInput(e.target.value); setPasswordError(false); }}
-                  placeholder="Enter manager password"
+                  placeholder="Enter password"
                   autoFocus
                   className={`block w-full rounded-xl border px-4 py-3 text-sm font-semibold text-slate-900 transition-colors focus:outline-none dark:text-white dark:bg-zinc-800 ${
                     passwordError
                       ? "border-rose-400 bg-rose-50 focus:border-rose-500 dark:border-rose-600 dark:bg-rose-950/20"
-                      : "border-slate-200 bg-slate-50 focus:border-indigo-500 dark:border-zinc-700"
+                      : "border-slate-200 bg-slate-50 focus:border-violet-500 dark:border-zinc-700"
                   }`}
                 />
                 {passwordError && (
@@ -429,7 +463,11 @@ export default function Home() {
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-500/25 transition-all hover:from-indigo-500 hover:to-violet-500 active:scale-95"
+                  className={`flex-1 rounded-xl py-2.5 text-sm font-semibold text-white shadow-lg transition-all active:scale-95 ${
+                    passwordTargetView === "customers"
+                      ? "bg-gradient-to-r from-violet-600 to-indigo-600 shadow-violet-500/25 hover:from-violet-500 hover:to-indigo-500"
+                      : "bg-gradient-to-r from-indigo-600 to-violet-600 shadow-indigo-500/25 hover:from-indigo-500 hover:to-violet-500"
+                  }`}
                 >
                   Unlock
                 </button>
