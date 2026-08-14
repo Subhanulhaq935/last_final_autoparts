@@ -389,18 +389,18 @@ export default function POSRegister({
             <div className="space-y-1">
               {discountAmount > 0 && (
                 <div className="flex items-baseline justify-between text-sm">
-                  <span className="text-slate-400 dark:text-zinc-500">Subtotal</span>
-                  <span className="font-semibold text-slate-600 dark:text-zinc-300">
+                  <span className="font-bold text-slate-600 dark:text-zinc-400">Subtotal</span>
+                  <span className="font-black text-slate-800 dark:text-zinc-200">
                     Rs.&nbsp;{totalAmount.toLocaleString()}
                   </span>
                 </div>
               )}
               {discountAmount > 0 && (
                 <div className="flex items-baseline justify-between text-sm">
-                  <span className="font-semibold text-rose-500">
+                  <span className="font-bold text-rose-500">
                     Discount{discountType === "percent" ? ` (${discountInput}%)` : ""}
                   </span>
-                  <span className="font-bold text-rose-500">
+                  <span className="font-black text-rose-500">
                     − Rs.&nbsp;{discountAmount.toLocaleString()}
                   </span>
                 </div>
@@ -601,14 +601,14 @@ export default function POSRegister({
         <div className="space-y-1">
           {discountAmount > 0 && (
             <div className="flex items-baseline justify-between text-sm">
-              <span className="text-slate-400 dark:text-zinc-500">Subtotal</span>
-              <span className="font-semibold text-slate-600 dark:text-zinc-300">Rs.&nbsp;{totalAmount.toLocaleString()}</span>
+              <span className="font-bold text-slate-600 dark:text-zinc-400">Subtotal</span>
+              <span className="font-black text-slate-800 dark:text-zinc-200">Rs.&nbsp;{totalAmount.toLocaleString()}</span>
             </div>
           )}
           {discountAmount > 0 && (
             <div className="flex items-baseline justify-between text-sm">
-              <span className="font-semibold text-rose-500">Discount{discountType === "percent" ? ` (${discountInput}%)` : ""}</span>
-              <span className="font-bold text-rose-500">− Rs.&nbsp;{discountAmount.toLocaleString()}</span>
+              <span className="font-bold text-rose-500">Discount{discountType === "percent" ? ` (${discountInput}%)` : ""}</span>
+              <span className="font-black text-rose-500">− Rs.&nbsp;{discountAmount.toLocaleString()}</span>
             </div>
           )}
           <div className="flex items-baseline justify-between border-t border-slate-100 pt-2 dark:border-zinc-700/60">

@@ -189,10 +189,10 @@ export default function ReceiptModal({
                         </span>
                       )}
                     </td>
-                    <td className="py-2 text-right font-bold text-zinc-800">{item.quantity}</td>
-                    <td className="py-2 text-right font-bold text-zinc-800">{item.product.price.toLocaleString()}</td>
+                    <td className="py-2 text-right font-black text-zinc-900">{item.quantity}</td>
+                    <td className="py-2 text-right font-black text-zinc-900">Rs. {item.product.price.toLocaleString()}</td>
                     <td className="py-2 text-right font-black text-zinc-900">
-                      {(item.product.price * item.quantity).toLocaleString()}
+                      Rs. {(item.product.price * item.quantity).toLocaleString()}
                     </td>
                   </tr>
                 ))}
@@ -207,7 +207,7 @@ export default function ReceiptModal({
               {/* Left: thank-you note */}
               <div className="space-y-1">
                 <p className="text-xs font-black uppercase tracking-wider text-zinc-400">Note</p>
-                <p className="text-sm font-light text-zinc-700">Thank you for your business!</p>
+                <p className="text-sm font-bold text-zinc-800">Thank you for your business!</p>
                 <p className="font-urdu text-sm font-bold text-zinc-700" dir="rtl">آپ کا شکریہ</p>
                 <p className="mt-2 text-[10px] text-zinc-400">Powered by Antigravity POS</p>
               </div>
@@ -215,20 +215,20 @@ export default function ReceiptModal({
               {/* Right: totals breakdown — full width on mobile */}
               <div className="w-full space-y-1.5 text-sm sm:w-auto sm:min-w-56">
                 {discountAmount > 0 && (
-                  <div className="flex justify-between gap-8 text-zinc-600">
-                    <span className="font-light">Subtotal</span>
-                    <span className="font-light">Rs. {subtotal.toLocaleString()}</span>
+                  <div className="flex justify-between gap-8 text-zinc-900">
+                    <span className="font-bold text-zinc-700">Subtotal</span>
+                    <span className="font-black text-zinc-900">Rs. {subtotal.toLocaleString()}</span>
                   </div>
                 )}
                 {discountAmount > 0 && (
                   <div className="flex justify-between gap-8 text-rose-600">
-                    <span className="font-light">Discount</span>
-                    <span className="font-light">− Rs. {discountAmount.toLocaleString()}</span>
+                    <span className="font-bold text-rose-600">Discount</span>
+                    <span className="font-black text-rose-600">− Rs. {discountAmount.toLocaleString()}</span>
                   </div>
                 )}
                 <div className="flex justify-between gap-8 border-t-2 border-zinc-900 pt-2 text-base">
                   <span className="font-black text-zinc-900">TOTAL</span>
-                  <span className="font-black text-zinc-900">Rs. {totalAmount.toLocaleString()}</span>
+                  <span className="font-black text-zinc-900 text-lg">Rs. {totalAmount.toLocaleString()}</span>
                 </div>
               </div>
             </div>
