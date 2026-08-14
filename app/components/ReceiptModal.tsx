@@ -235,14 +235,11 @@ export default function ReceiptModal({
           </div>
 
           {/* Bottom strip — wraps gracefully on small screens */}
-          <div className="bg-zinc-900 px-4 py-2.5 text-center sm:px-8 print:px-6">
-            <p className="text-[10px] font-semibold leading-relaxed tracking-wide text-zinc-400 sm:text-[11px]">
-              {SHOP.name} · {SHOP.address}
+          <div className="bg-zinc-900 px-4 py-3 text-center sm:px-8 print:px-6">
+            <p className="text-xs font-bold leading-relaxed tracking-wide text-zinc-200 sm:text-sm">
+              <span className="font-black text-white">{SHOP.name}</span> · <span className="font-extrabold text-white underline decoration-amber-500/50 underline-offset-2">{SHOP.address}</span>
             </p>
-            <p className="mt-0.5 text-[10px] font-semibold tracking-wide text-zinc-500 sm:hidden">
-              {SHOP.phones.join(" · ")}
-            </p>
-            <p className="hidden text-[11px] font-semibold tracking-wide text-zinc-400 sm:block">
+            <p className="mt-1 text-xs font-bold tracking-wide text-zinc-300 sm:text-xs">
               {SHOP.phones.join(" · ")}
             </p>
           </div>
