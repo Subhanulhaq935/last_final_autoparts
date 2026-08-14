@@ -121,7 +121,8 @@ export default function Home() {
   const [receiptTotal,      setReceiptTotal]      = useState(0);
   const [receiptDiscount,   setReceiptDiscount]   = useState(0);
   const [receiptCustomer,   setReceiptCustomer]   = useState("");
-  const [receiptInvoiceNum, setReceiptInvoiceNum] = useState("");
+  const [receiptInvoiceNum,     setReceiptInvoiceNum]     = useState("");
+  const [receiptPaymentMethod,  setReceiptPaymentMethod]  = useState<"cash" | "card">("cash");
 
   // Manager password gate
   const [managerUnlocked,    setManagerUnlocked]    = useState(false);
@@ -181,7 +182,7 @@ export default function Home() {
   const handleClearCart = () => setCart([]);
 
   // ── Checkout ────────────────────────────────────────────────────────────────
-  const handleCheckout = (discountAmount: number, customerName: string) => {
+  const handleCheckout = (discountAmount: number, customerName: string, paymentMethod: "cash" | "card") => {
     const subtotal   = cart.reduce((acc, i) => acc + i.product.price * i.quantity, 0);
     const finalTotal = subtotal - discountAmount;
     const invoiceNum = `INV-${Math.floor(100000 + Math.random() * 900000)}`;
@@ -191,6 +192,7 @@ export default function Home() {
     setReceiptDiscount(discountAmount);
     setReceiptCustomer(customerName);
     setReceiptInvoiceNum(invoiceNum);
+    setReceiptPaymentMethod(paymentMethod);
     setIsReceiptOpen(true);
     setCart([]);
   };
@@ -331,6 +333,7 @@ export default function Home() {
         discountAmount={receiptDiscount}
         customerName={receiptCustomer}
         invoiceNumber={receiptInvoiceNum}
+        paymentMethod={receiptPaymentMethod}
       />
 
       {/* Store Manager Password Modal */}

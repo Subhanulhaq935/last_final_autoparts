@@ -17,6 +17,7 @@ interface ReceiptModalProps {
   discountAmount?: number;
   customerName?: string;
   invoiceNumber: string;
+  paymentMethod?: "cash" | "card";
 }
 
 const SHOP = {
@@ -34,6 +35,7 @@ export default function ReceiptModal({
   discountAmount = 0,
   customerName = "",
   invoiceNumber,
+  paymentMethod = "cash",
 }: ReceiptModalProps) {
   const printRef = useRef<HTMLDivElement>(null);
 
@@ -90,8 +92,8 @@ export default function ReceiptModal({
 
               {/* Logo + company info */}
               <div className="flex items-center gap-3 sm:gap-4">
-                <div className="flex-shrink-0 print:scale-75 print:origin-left">
-                  <MKSLogo size={60} />
+                <div className="flex-shrink-0 print:scale-90 print:origin-left">
+                  <MKSLogo size={80} />
                 </div>
                 <div className="min-w-0">
                   <p className="text-sm font-black text-zinc-900 sm:text-base">{SHOP.name}</p>
@@ -152,6 +154,15 @@ export default function ReceiptModal({
               <div>
                 <p className="font-black uppercase tracking-wider text-zinc-400">Invoice Amount</p>
                 <p className="mt-0.5 font-black text-zinc-900">Rs. {totalAmount.toLocaleString()}</p>
+              </div>
+              <div className="h-6 w-px bg-zinc-300" />
+              <div>
+                <p className="font-black uppercase tracking-wider text-zinc-400">Payment</p>
+                <p className={`mt-0.5 font-black ${
+                  paymentMethod === "cash" ? "text-emerald-700" : "text-indigo-700"
+                }`}>
+                  {paymentMethod === "cash" ? "💵 Cash" : "💳 Credit Card"}
+                </p>
               </div>
             </div>
           </div>
@@ -229,6 +240,14 @@ export default function ReceiptModal({
                 <div className="flex justify-between gap-8 border-t-2 border-zinc-900 pt-2 text-base">
                   <span className="font-black text-zinc-900">TOTAL</span>
                   <span className="font-black text-zinc-900 text-lg">Rs. {totalAmount.toLocaleString()}</span>
+                </div>
+                <div className="mt-2 flex items-center justify-between rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2">
+                  <span className="text-xs font-black uppercase tracking-wider text-zinc-400">Payment Method</span>
+                  <span className={`text-sm font-black ${
+                    paymentMethod === "cash" ? "text-emerald-700" : "text-indigo-700"
+                  }`}>
+                    {paymentMethod === "cash" ? "💵 Cash" : "💳 Credit Card"}
+                  </span>
                 </div>
               </div>
             </div>
