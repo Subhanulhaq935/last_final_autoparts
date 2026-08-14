@@ -1,14 +1,27 @@
 "use client";
 
 import MKSLogo from "./MKSLogo";
+import OfflineStatus from "./OfflineStatus";
 
 interface HeaderProps {
-  currentView: "register" | "manager";
+  currentView:  "register" | "manager";
   onViewChange: (view: "register" | "manager") => void;
   productsCount: number;
+  isOnline:     boolean;
+  pendingCount: number;
+  isSyncing:    boolean;
+  justSynced:   boolean;
 }
 
-export default function Header({ currentView, onViewChange, productsCount }: HeaderProps) {
+export default function Header({
+  currentView,
+  onViewChange,
+  productsCount,
+  isOnline,
+  pendingCount,
+  isSyncing,
+  justSynced,
+}: HeaderProps) {
   return (
     <header className="sticky top-0 z-40 w-full border-b border-slate-200/80 bg-white/95 backdrop-blur-xl shadow-sm dark:border-slate-800 dark:bg-zinc-950/95">
       <div className="mx-auto flex h-14 max-w-7xl items-center justify-between gap-2 px-3 sm:h-16 sm:gap-3 sm:px-6 lg:px-8">
@@ -17,7 +30,7 @@ export default function Header({ currentView, onViewChange, productsCount }: Hea
         <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
           <div className="relative flex-shrink-0">
             <MKSLogo size={36} />
-            <div className="absolute -bottom-0.5 -right-0.5 h-2 w-2 rounded-full border-2 border-white bg-emerald-500 dark:border-zinc-950 sm:h-2.5 sm:w-2.5"></div>
+            <div className={`absolute -bottom-0.5 -right-0.5 h-2 w-2 rounded-full border-2 border-white dark:border-zinc-950 sm:h-2.5 sm:w-2.5 transition-colors ${isOnline ? 'bg-emerald-500' : 'bg-rose-500'}`} />
           </div>
           <div className="min-w-0 overflow-hidden">
             <h1 className="truncate text-sm font-black tracking-tight text-zinc-900 dark:text-white sm:text-base">
@@ -66,15 +79,14 @@ export default function Header({ currentView, onViewChange, productsCount }: Hea
           </button>
         </nav>
 
-        {/* Status Badge — desktop only */}
-        <div className="hidden items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1.5 sm:flex dark:border-emerald-900/50 dark:bg-emerald-950/20">
-          <div className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500"></div>
-          <span className="text-[11px] font-semibold text-emerald-700 dark:text-emerald-400">
-            MongoDB Synced
-          </span>
-        </div>
+        {/* Live Offline/Online Status Badge */}
+        <OfflineStatus
+          isOnline={isOnline}
+          pendingCount={pendingCount}
+          isSyncing={isSyncing}
+          justSynced={justSynced}
+        />
       </div>
     </header>
-
   );
 }

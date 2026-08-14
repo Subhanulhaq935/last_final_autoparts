@@ -1,19 +1,23 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import Header from "./components/Header";
-import POSRegister from "./components/POSRegister";
-import StoreManager from "./components/StoreManager";
-import ReceiptModal from "./components/ReceiptModal";
-import MKSLogo from "./components/MKSLogo";
+import { useState } from "react";
+import Header        from "./components/Header";
+import POSRegister   from "./components/POSRegister";
+import StoreManager  from "./components/StoreManager";
+import ReceiptModal  from "./components/ReceiptModal";
+import MKSLogo       from "./components/MKSLogo";
 import type { Product, Category } from "./types";
 
+import { useOnlineStatus } from "@/lib/useOnlineStatus";
+import { useOfflineData  } from "@/lib/useOfflineData";
+import { useSyncEngine   } from "@/lib/useSyncEngine";
+
 interface CartItem {
-  product: Product;
+  product:  Product;
   quantity: number;
 }
 
-// ─── Loading skeleton shown while fetching from MongoDB ──────────────────────
+// ─── Loading skeleton shown while fetching ────────────────────────────────────
 function LoadingSkeleton() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-zinc-50 dark:bg-black">
@@ -27,58 +31,105 @@ function LoadingSkeleton() {
   );
 }
 
-// ─── Error screen shown if DB is unreachable ─────────────────────────────────
-function ErrorScreen({ message, onRetry }: { message: string; onRetry: () => void }) {
+// ─── Error screen (API unreachable AND no IndexedDB fallback) ─────────────────
+function ErrorScreen({
+  message,
+  onRetry,
+  isOffline,
+}: {
+  message:   string;
+  onRetry:   () => void;
+  isOffline: boolean;
+}) {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-zinc-50 dark:bg-black px-6">
       <div className="max-w-sm text-center">
-        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-rose-100 dark:bg-rose-950/40">
-          <svg className="h-7 w-7 text-rose-600 dark:text-rose-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
-          </svg>
+        <div className={`mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl ${
+          isOffline
+            ? "bg-amber-100 dark:bg-amber-950/40"
+            : "bg-rose-100 dark:bg-rose-950/40"
+        }`}>
+          {isOffline ? (
+            <svg className="h-7 w-7 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M8.288 15.038a5.25 5.25 0 017.424 0M5.106 11.856c3.807-3.808 9.98-3.808 13.788 0M1.924 8.674c5.565-5.565 14.587-5.565 20.152 0M12.53 18.22l-.53.53-.53-.53a.75.75 0 011.06 0Z" />
+            </svg>
+          ) : (
+            <svg className="h-7 w-7 text-rose-600 dark:text-rose-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+            </svg>
+          )}
         </div>
-        <h2 className="text-lg font-black text-slate-900 dark:text-white">Database Connection Error</h2>
+        <h2 className="text-lg font-black text-slate-900 dark:text-white">
+          {isOffline ? "You're Offline" : "Database Connection Error"}
+        </h2>
         <p className="mt-2 text-sm text-slate-500 dark:text-zinc-400">{message}</p>
-        <p className="mt-1 text-xs text-slate-400 dark:text-zinc-600">
-          Make sure MongoDB is running and MONGODB_URI is set in .env.local
-        </p>
-        <button
-          onClick={onRetry}
-          className="mt-6 rounded-xl bg-indigo-600 px-6 py-2.5 text-sm font-semibold text-white hover:bg-indigo-500"
-        >
-          Retry
-        </button>
+        {!isOffline && (
+          <p className="mt-1 text-xs text-slate-400 dark:text-zinc-600">
+            Make sure MongoDB is running and MONGODB_URI is set in .env.local
+          </p>
+        )}
+        {isOffline && (
+          <p className="mt-1 text-xs text-slate-400 dark:text-zinc-600">
+            Open the app while connected to the internet at least once to cache data locally.
+          </p>
+        )}
+        {!isOffline && (
+          <button
+            onClick={onRetry}
+            className="mt-6 rounded-xl bg-indigo-600 px-6 py-2.5 text-sm font-semibold text-white hover:bg-indigo-500"
+          >
+            Retry
+          </button>
+        )}
       </div>
     </div>
   );
 }
 
-// ─── Manager password is set in .env.local (NEXT_PUBLIC_MANAGER_PASSWORD) ────
+// ─── Manager password ─────────────────────────────────────────────────────────
 const MANAGER_PASSWORD = process.env.NEXT_PUBLIC_MANAGER_PASSWORD ?? "";
 
+// ─── Main Page ────────────────────────────────────────────────────────────────
 export default function Home() {
-  const [showWelcome, setShowWelcome] = useState(true);
-  const [view, setView] = useState<"register" | "manager">("register");
-  const [products, setProducts] = useState<Product[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [cart, setCart] = useState<CartItem[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [loadError, setLoadError] = useState<string | null>(null);
+  // ── Offline / data layer ────────────────────────────────────────────────────
+  const isOnline = useOnlineStatus();
 
-  // Checkout Modal State
-  const [isReceiptOpen, setIsReceiptOpen] = useState(false);
-  const [receiptCart, setReceiptCart] = useState<CartItem[]>([]);
-  const [receiptTotal, setReceiptTotal] = useState(0);
-  const [receiptDiscount, setReceiptDiscount] = useState(0);
-  const [receiptCustomer, setReceiptCustomer] = useState("");
+  const {
+    products,
+    categories,
+    isLoading,
+    loadError,
+    isOfflineLoad,
+    loadData,
+    handleAddProduct,
+    handleUpdateProductPrice,
+    handleUpdateProductDetails,
+    handleDeleteProduct,
+    handleResetToDefault,
+  } = useOfflineData();
+
+  const { pendingCount, isSyncing, justSynced } = useSyncEngine(isOnline, loadData);
+
+  // ── UI state ────────────────────────────────────────────────────────────────
+  const [showWelcome, setShowWelcome] = useState(true);
+  const [view, setView]               = useState<"register" | "manager">("register");
+  const [cart, setCart]               = useState<CartItem[]>([]);
+
+  // Checkout modal
+  const [isReceiptOpen,     setIsReceiptOpen]     = useState(false);
+  const [receiptCart,       setReceiptCart]       = useState<CartItem[]>([]);
+  const [receiptTotal,      setReceiptTotal]      = useState(0);
+  const [receiptDiscount,   setReceiptDiscount]   = useState(0);
+  const [receiptCustomer,   setReceiptCustomer]   = useState("");
   const [receiptInvoiceNum, setReceiptInvoiceNum] = useState("");
 
-  // ── Manager Password Gate ───────────────────────────────────────────────────
-  const [managerUnlocked, setManagerUnlocked] = useState(false);
-  const [showPasswordModal, setShowPasswordModal] = useState(false);
-  const [passwordInput, setPasswordInput] = useState("");
-  const [passwordError, setPasswordError] = useState(false);
+  // Manager password gate
+  const [managerUnlocked,    setManagerUnlocked]    = useState(false);
+  const [showPasswordModal,  setShowPasswordModal]  = useState(false);
+  const [passwordInput,      setPasswordInput]      = useState("");
+  const [passwordError,      setPasswordError]      = useState(false);
 
+  // ── View change / password ──────────────────────────────────────────────────
   const handleViewChange = (newView: "register" | "manager") => {
     if (newView === "manager" && !managerUnlocked) {
       setPasswordInput("");
@@ -86,10 +137,7 @@ export default function Home() {
       setShowPasswordModal(true);
       return;
     }
-    if (newView === "register") {
-      // Lock the manager again when leaving
-      setManagerUnlocked(false);
-    }
+    if (newView === "register") setManagerUnlocked(false);
     setView(newView);
   };
 
@@ -107,235 +155,36 @@ export default function Home() {
     }
   };
 
-  // ── Fetch products + categories from MongoDB ────────────────────────────────
-  const loadData = useCallback(async (isRetry = false) => {
-    setIsLoading(true);
-    setLoadError(null);
-    try {
-      const [prodRes, catRes] = await Promise.all([
-        fetch("/api/products"),
-        fetch("/api/categories"),
-      ]);
-
-      // If server is still starting up (405/503), retry once after a delay
-      if ((!prodRes.ok || !catRes.ok) && !isRetry) {
-        const status = !prodRes.ok ? prodRes.status : catRes.status;
-        if (status === 405 || status === 503 || status === 500) {
-          await new Promise((r) => setTimeout(r, 1500));
-          return loadData(true);
-        }
-      }
-
-      if (!prodRes.ok || !catRes.ok) {
-        let detail = "";
-        try {
-          const errBody = await (!prodRes.ok ? prodRes : catRes).json();
-          detail = errBody?.error ? ` (${errBody.error})` : "";
-        } catch {}
-        throw new Error(
-          `API returned status ${!prodRes.ok ? prodRes.status : catRes.status}${detail}. Check MONGODB_URI in .env.local and restart the dev server.`
-        );
-      }
-
-      const [prodData, catData] = await Promise.all([
-        prodRes.json(),
-        catRes.json(),
-      ]);
-
-      // If DB is empty, auto-seed on first visit
-      if (prodData.length === 0) {
-        await fetch("/api/seed", { method: "POST" });
-        // Re-fetch after seeding
-        const [seededProds, seededCats] = await Promise.all([
-          fetch("/api/products").then((r) => r.json()),
-          fetch("/api/categories").then((r) => r.json()),
-        ]);
-        setProducts(seededProds);
-        setCategories(seededCats);
-      } else {
-        setProducts(prodData);
-        setCategories(catData);
-      }
-    } catch (err: unknown) {
-      console.error("Failed to load data:", err);
-      setLoadError(
-        err instanceof Error ? err.message : "Unknown error occurred."
-      );
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    loadData();
-  }, [loadData]);
-
-  // ── Cart Handlers ───────────────────────────────────────────────────────────
+  // ── Cart handlers ───────────────────────────────────────────────────────────
   const handleAddToCart = (product: Product) => {
-    setCart((prevCart) => {
-      const existing = prevCart.find((item) => item.product.id === product.id);
+    setCart((prev) => {
+      const existing = prev.find((i) => i.product.id === product.id);
       if (existing) {
-        return prevCart.map((item) =>
-          item.product.id === product.id
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
+        return prev.map((i) =>
+          i.product.id === product.id ? { ...i, quantity: i.quantity + 1 } : i
         );
       }
-      return [...prevCart, { product, quantity: 1 }];
+      return [...prev, { product, quantity: 1 }];
     });
   };
 
-  const handleRemoveFromCart = (productId: string) => {
-    setCart((prevCart) => prevCart.filter((item) => item.product.id !== productId));
-  };
+  const handleRemoveFromCart = (productId: string) =>
+    setCart((prev) => prev.filter((i) => i.product.id !== productId));
 
   const handleUpdateCartQty = (productId: string, qty: number) => {
-    if (qty <= 0) {
-      handleRemoveFromCart(productId);
-      return;
-    }
-    setCart((prevCart) =>
-      prevCart.map((item) =>
-        item.product.id === productId ? { ...item, quantity: qty } : item
-      )
+    if (qty <= 0) { handleRemoveFromCart(productId); return; }
+    setCart((prev) =>
+      prev.map((i) => (i.product.id === productId ? { ...i, quantity: qty } : i))
     );
   };
 
-  const handleClearCart = () => {
-    setCart([]);
-  };
+  const handleClearCart = () => setCart([]);
 
-  // ── Inventory Handlers (all backed by MongoDB API) ──────────────────────────
-
-  const handleUpdateProductPrice = async (productId: string, newPrice: number) => {
-    // Optimistic UI update
-    setProducts((prev) =>
-      prev.map((p) => (p.id === productId ? { ...p, price: newPrice } : p))
-    );
-    setCart((prevCart) =>
-      prevCart.map((item) =>
-        item.product.id === productId
-          ? { ...item, product: { ...item.product, price: newPrice } }
-          : item
-      )
-    );
-
-    try {
-      const res = await fetch(`/api/products/${productId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ price: newPrice }),
-      });
-      if (!res.ok) throw new Error("Price update failed");
-    } catch (err) {
-      console.error("Failed to update price:", err);
-      // Revert on failure
-      loadData();
-    }
-  };
-
-  const handleUpdateProductDetails = async (
-    productId: string,
-    updatedFields: Partial<Product>
-  ) => {
-    // Optimistic UI update
-    setProducts((prev) =>
-      prev.map((p) => (p.id === productId ? { ...p, ...updatedFields } : p))
-    );
-    setCart((prevCart) =>
-      prevCart.map((item) =>
-        item.product.id === productId
-          ? { ...item, product: { ...item.product, ...updatedFields } }
-          : item
-      )
-    );
-
-    try {
-      const res = await fetch(`/api/products/${productId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updatedFields),
-      });
-      if (!res.ok) throw new Error("Update failed");
-    } catch (err) {
-      console.error("Failed to update product:", err);
-      loadData();
-    }
-  };
-
-  const handleAddProduct = async (newProduct: Omit<Product, "id">) => {
-    const tempId = `prod_${Date.now()}`;
-    const optimisticProduct: Product = { ...newProduct, id: tempId };
-
-    // Optimistic add
-    setProducts((prev) => [...prev, optimisticProduct]);
-
-    try {
-      const res = await fetch("/api/products", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...newProduct, id: tempId }),
-      });
-      if (!res.ok) throw new Error("Add product failed");
-      const created: Product = await res.json();
-
-      // Replace optimistic item with real one from DB
-      setProducts((prev) =>
-        prev.map((p) => (p.id === tempId ? created : p))
-      );
-    } catch (err) {
-      console.error("Failed to add product:", err);
-      // Remove the optimistic item
-      setProducts((prev) => prev.filter((p) => p.id !== tempId));
-    }
-  };
-
-  const handleDeleteProduct = async (productId: string) => {
-    if (!confirm("Are you sure you want to delete this product from inventory?")) return;
-
-    // Optimistic delete
-    setProducts((prev) => prev.filter((p) => p.id !== productId));
-    handleRemoveFromCart(productId);
-
-    try {
-      const res = await fetch(`/api/products/${productId}`, { method: "DELETE" });
-      if (!res.ok) throw new Error("Delete failed");
-    } catch (err) {
-      console.error("Failed to delete product:", err);
-      loadData(); // Re-fetch to restore state
-    }
-  };
-
-  const handleResetToDefault = async () => {
-    if (
-      !confirm(
-        "This will restore any missing default products and categories. Your custom names and prices will be kept. Continue?"
-      )
-    )
-      return;
-
-    try {
-      setIsLoading(true);
-      const res = await fetch("/api/seed", { method: "POST" });
-      if (!res.ok) throw new Error("Seed failed");
-      await loadData();
-      setCart([]);
-    } catch (err) {
-      console.error("Reset to default failed:", err);
-      setIsLoading(false);
-      alert("Failed to reset defaults. Please check MongoDB connection.");
-    }
-  };
-
-  // ── Checkout Handler ────────────────────────────────────────────────────────
+  // ── Checkout ────────────────────────────────────────────────────────────────
   const handleCheckout = (discountAmount: number, customerName: string) => {
-    const subtotal = cart.reduce(
-      (acc, item) => acc + item.product.price * item.quantity,
-      0
-    );
+    const subtotal   = cart.reduce((acc, i) => acc + i.product.price * i.quantity, 0);
     const finalTotal = subtotal - discountAmount;
-    const randomNum = Math.floor(100000 + Math.random() * 900000);
-    const invoiceNum = `INV-${randomNum}`;
+    const invoiceNum = `INV-${Math.floor(100000 + Math.random() * 900000)}`;
 
     setReceiptCart(cart);
     setReceiptTotal(finalTotal);
@@ -346,7 +195,7 @@ export default function Home() {
     setCart([]);
   };
 
-  // ── Welcome Screen ──────────────────────────────────────────────────────────
+  // ── Welcome screen ──────────────────────────────────────────────────────────
   if (showWelcome) {
     return (
       <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-zinc-950 px-5 py-10 text-center sm:px-8">
@@ -355,7 +204,7 @@ export default function Home() {
           <div className="absolute left-1/2 top-1/2 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-amber-500/5 blur-3xl" />
         </div>
 
-        {/* Logo — smaller on phones */}
+        {/* Logo */}
         <div className="relative">
           <div className="absolute inset-0 scale-150 rounded-full bg-amber-500/8 blur-2xl" />
           <MKSLogo size={120} />
@@ -386,7 +235,7 @@ export default function Home() {
           Bara Sandha Stop, T 4, Band Road, Lahore
         </p>
 
-        {/* Phone numbers — 1 col on xs, 3 col on sm+ */}
+        {/* Phone numbers */}
         <div className="mt-4 grid grid-cols-1 items-center justify-center gap-2 sm:grid-cols-3 sm:gap-3">
           {["0300-4254118", "0300-4177275", "0334-0450186"].map((num) => (
             <div
@@ -401,7 +250,7 @@ export default function Home() {
           ))}
         </div>
 
-        {/* Enter button — full width on mobile, auto on sm+ */}
+        {/* Enter button */}
         <button
           onClick={() => setShowWelcome(false)}
           className="mt-8 flex w-full items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 px-9 py-4 text-base font-black text-black shadow-2xl shadow-amber-500/25 transition-all hover:from-amber-400 hover:to-amber-500 hover:shadow-amber-500/35 active:scale-95 sm:mt-10 sm:w-auto"
@@ -419,24 +268,42 @@ export default function Home() {
 
   // ── Loading / Error states ──────────────────────────────────────────────────
   if (isLoading) return <LoadingSkeleton />;
-  if (loadError) return <ErrorScreen message={loadError} onRetry={loadData} />;
+  if (loadError) return (
+    <ErrorScreen
+      message={loadError}
+      onRetry={loadData}
+      isOffline={!isOnline}
+    />
+  );
 
-  // ── Main App ────────────────────────────────────────────────────────────────
+  // ── Main app ────────────────────────────────────────────────────────────────
   return (
     <div className="flex min-h-screen flex-col bg-zinc-50 font-sans text-zinc-900 dark:bg-black dark:text-zinc-50 print:bg-white print:text-black">
-      {/* Top Header */}
       <Header
         currentView={view}
         onViewChange={handleViewChange}
         productsCount={products.length}
+        isOnline={isOnline}
+        pendingCount={pendingCount}
+        isSyncing={isSyncing}
+        justSynced={justSynced}
       />
 
-      {/* Main View Container */}
+      {/* Offline banner — shown below header when using cached data */}
+      {isOfflineLoad && (
+        <div className="flex items-center justify-center gap-2 bg-amber-50 px-4 py-2 text-xs font-semibold text-amber-700 dark:bg-amber-950/30 dark:text-amber-400 border-b border-amber-200 dark:border-amber-900/40">
+          <svg className="h-3.5 w-3.5 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M8.288 15.038a5.25 5.25 0 017.424 0M5.106 11.856c3.807-3.808 9.98-3.808 13.788 0M1.924 8.674c5.565-5.565 14.587-5.565 20.152 0M12.53 18.22l-.53.53-.53-.53a.75.75 0 011.06 0Z" />
+          </svg>
+          Offline — showing locally cached inventory. Changes will sync when connectivity returns.
+        </div>
+      )}
+
       <main className="flex-1 print:p-0">
         {view === "register" ? (
           <POSRegister
             products={products}
-            categories={categories}
+            categories={categories as Category[]}
             cart={cart}
             onAddToCart={handleAddToCart}
             onRemoveFromCart={handleRemoveFromCart}
@@ -447,7 +314,7 @@ export default function Home() {
         ) : (
           <StoreManager
             products={products}
-            categories={categories}
+            categories={categories as Category[]}
             onUpdateProductPrice={handleUpdateProductPrice}
             onUpdateProductDetails={handleUpdateProductDetails}
             onAddProduct={handleAddProduct}
@@ -456,7 +323,6 @@ export default function Home() {
         )}
       </main>
 
-      {/* Invoice receipt modal */}
       <ReceiptModal
         isOpen={isReceiptOpen}
         onClose={() => setIsReceiptOpen(false)}
@@ -467,7 +333,7 @@ export default function Home() {
         invoiceNumber={receiptInvoiceNum}
       />
 
-      {/* ── Store Manager Password Modal ─────────────────────────────────── */}
+      {/* Store Manager Password Modal */}
       {showPasswordModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
           <div className="w-full max-w-sm overflow-hidden rounded-2xl bg-white shadow-2xl dark:bg-zinc-900">

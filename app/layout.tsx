@@ -15,6 +15,16 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Shabbir Khan Auto Body Parts — Billing System",
   description: "POS & inventory management for Shabbir Khan Auto Body Parts, Band Road, Lahore.",
+  // PWA meta
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "MKS Billing",
+  },
+  other: {
+    "mobile-web-app-capable": "yes",
+  },
 };
 
 export const viewport: Viewport = {
@@ -22,6 +32,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   viewportFit: "cover",
+  themeColor: "#09090b",
 };
 
 export default function RootLayout({
@@ -34,7 +45,32 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <head>
+        {/* Apple touch icon for iOS */}
+        <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+      </head>
+      <body className="min-h-full flex flex-col">
+        {children}
+
+        {/* Service Worker registration — runs only in the browser */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              if ('serviceWorker' in navigator) {
+                window.addEventListener('load', function () {
+                  navigator.serviceWorker.register('/sw.js', { scope: '/' })
+                    .then(function(reg) {
+                      console.log('[SW] Registered, scope:', reg.scope);
+                    })
+                    .catch(function(err) {
+                      console.warn('[SW] Registration failed:', err);
+                    });
+                });
+              }
+            `,
+          }}
+        />
+      </body>
     </html>
   );
 }
